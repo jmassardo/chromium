@@ -1,0 +1,16 @@
+# Make sure there aren't any other chrome instances running
+try {
+    Get-Process -ProcessName "chrome" | Stop-Process
+    } 
+catch {
+    Write-Output "Chrome isn't running."
+}
+
+# Launch Chromium and wait for it to exit. Once it gets the exit command, kill all its threads
+
+try {
+  $p = Start-Process {{pkg.path}}\bin\chrome.exe -ArgumentList "{{cfg.url}}" -PassThru # do not add -Wait arg
+  $p.WaitForExit()
+} finally {
+  if(!$p.HasExited) { $p.Kill() }
+}
